@@ -1,4 +1,4 @@
-package exercises;
+package exercises.exer2;
 
 public class Team {
     private String name;

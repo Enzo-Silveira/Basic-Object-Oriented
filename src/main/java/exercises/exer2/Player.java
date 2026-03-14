@@ -1,4 +1,4 @@
-package exercises;
+package exercises.exer2;
 
 public class Player {
     private String name;

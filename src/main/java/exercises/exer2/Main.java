@@ -1,6 +1,4 @@
-package exercises;
-
-import java.sql.SQLOutput;
+package exercises.exer2;
 
 public class Main {
     void main(){
