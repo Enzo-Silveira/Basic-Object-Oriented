@@ -1,12 +1,23 @@
 package exercises.exer1;
 
 public class Main {
-    void main(){
+
+    void main() {
+
         Deck deck = new Deck();
-        deck.drawCard();
 
-        deck.drawCards(5);
+        Card c1 = deck.drawCard();
+        c1.setVisible(true);
 
-        System.out.println(deck.remainingCards());
+        System.out.println(c1.state());
+
+        Card[] varias = deck.drawCards(15);
+
+        for (Card c : varias) {
+            if (c != null) {
+                c.setVisible(true);
+                System.out.println(c.state());
+            }
+        }
     }
 }
