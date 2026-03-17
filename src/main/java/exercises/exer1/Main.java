@@ -19,5 +19,7 @@ public class Main {
                 System.out.println(c.state());
             }
         }
+
+        System.out.println(new Card("Pipoca", "999").state());
     }
 }
