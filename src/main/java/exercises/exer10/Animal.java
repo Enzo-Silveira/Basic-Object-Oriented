@@ -1,12 +1,13 @@
 package exercises.exer10;
 
-public abstract class Animal{
-    private String name;
-    public abstract void makeSound();
+public abstract class Animal {
+    private final String name;
 
     public Animal(String name) {
         this.name = name;
     }
+
+    public abstract void makeSound();
 
     public String getName() {
         return name;

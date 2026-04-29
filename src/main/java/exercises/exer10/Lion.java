@@ -1,6 +1,6 @@
 package exercises.exer10;
 
-public class Lion extends Animal {
+public class Lion extends Animal implements Runner {
 
     public Lion(String name) {
         super(name);
@@ -10,6 +10,8 @@ public class Lion extends Animal {
     public void makeSound() {
         System.out.println("Rrrrrwaarrr!");
     }
+
+    @Override
     public void run(){
         System.out.println("Lion is running!");
     }
