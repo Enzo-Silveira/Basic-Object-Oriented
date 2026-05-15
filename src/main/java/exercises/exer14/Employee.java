@@ -65,6 +65,7 @@ public class Employee {
     }
 
     public void setSalary(double salary) {
+        if(salary<this.salary)throw new IllegalArgumentException("New salary cannot be smaller than current salary.");
         this.salary = salary;
     }
 

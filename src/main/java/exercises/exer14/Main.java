@@ -9,9 +9,11 @@ import java.util.Scanner;
 public class Main {
     public static void main() {
         int index = 1;
-        Map<String, Employee> employees;
-        Company company = new Company();
-        while(index != 0) {
+        EmployeeRepository repository = new EmployeeRepository();
+        SalaryManagementService salaryService = new SalaryManagementService(repository);
+        EmployeeManagementService employeeService = new EmployeeManagementService(repository);
+
+        while (index != 0) {
             System.out.println("-----------MENU-----------\n" +
                     "Type the desired operation number:\n" +
                     "1 - hire;                   5 - pay;\n" +
@@ -20,152 +22,163 @@ public class Main {
                     "4 - getEmployeesByTitle;    8 - averageSalaryByDate;\n" +
                     "0 - Exit;\n");
             Scanner scanner = new Scanner(System.in);
-            try {
-                index = scanner.nextInt();
-            } catch (Exception e) {
-                index = -1;
+            String input = scanner.nextLine();
+            if (!input.matches("\\d+")) {
+                continue;
             }
-            scanner.nextLine();
-            switch (index){
+            index = Integer.parseInt(input);
+            switch (index) {
                 case 0:
                     System.out.println("\nSystem closed.\n");
                     break;
                 case 1:
-                    try {
-                        System.out.println("Id of Employee: \n");
-                        String idH = scanner.nextLine();
-                        if(company.getEmployees().containsKey(idH)){
-                            System.out.println("\nInvalid Id.\n");
-                            break;
-                        }
-                        System.out.println("Name of Employee:\n");
-                        String name = scanner.nextLine();
-                        System.out.println("JobTitle of Employee:\n");
-                        String jobTitle = scanner.nextLine();
-                        System.out.println("Salary of Employee:\n");
-                        double salary = 0;
-                        try {
-                            salary = scanner.nextDouble();
-                        } catch (InputMismatchException e) {
-                            System.out.println("Invalid salary entry.");
-                            break;
-                        }
-                        scanner.nextLine();
-                        company.hire(idH,name,jobTitle,salary);
+
+                    System.out.println("Id of Employee: \n");
+                    String idH = scanner.nextLine();
+                    if (employeeService.getAllEmployees().stream().anyMatch(e -> e.getId().equals(idH))) {
+                        System.out.println("\nInvalid Id.\n");
+                        break;
+                    }
+                    System.out.println("Name of Employee:\n");
+                    String name = scanner.nextLine();
+                    System.out.println("JobTitle of Employee:\n");
+                    String jobTitle = scanner.nextLine();
+                    System.out.println("Salary of Employee:\n");
+                    double salary;
+                    input = scanner.nextLine();
+                    if (!input.matches("\\d+")) {
+                        continue;
+                    }
+                    salary = Double.parseDouble(input);
+                    employeeService.hireEmployee(idH, name, jobTitle, salary);
+                    if (employeeService.getAllEmployees().stream().anyMatch(e -> e.getId().equals(idH))) {
                         System.out.println("\nEmployee hired.\n");
-                    } catch (NullPointerException e) {
-                        System.out.println(e.getMessage());
                     }
 
                     break;
                 case 2:
-                    try {
-                        System.out.println("Id of Employee: \n");
-                        String idF = scanner.nextLine();
-                        if(!company.getEmployees().containsKey(idF)){
-                            System.out.println("\nEmployee does not exist.\n");
-                            break;
-                        }
-                        company.fire(idF);
-                        System.out.println("\nEmployee fired.\n");
-                    } catch (NullPointerException e) {
-                        System.out.println(e.getMessage());
+
+                    System.out.println("Id of Employee: \n");
+                    String idF = scanner.nextLine();
+                    if (!employeeService.getAllEmployees().stream().anyMatch(e -> e.getId().equals(idF))) {
+                        System.out.println("\nEmployee does not exist.\n");
+                        break;
                     }
+                    employeeService.fireEmployee(idF);
+                    if (!employeeService.getAllEmployees().stream().anyMatch(e -> e.getId().equals(idF))) {
+                        System.out.println("\nEmployee fired.\n");
+                    }
+
                     break;
                 case 3:
-                    try {
-                        employees = company.getEmployees();
-                        employees.values().stream().map(Employee::toString).forEach(e-> System.out.println(e));
-                    } catch (NullPointerException e) {
-                        System.out.println(e.getMessage());
-                    }
+                    employeeService.getAllEmployees().stream().map(Employee::toString).forEach(System.out::println);
                     break;
                 case 4:
-                    try {
-                        System.out.println("JobTitle of Employee:\n");
-                        String jobTitleGet = scanner.nextLine();
-                        employees = company.getEmployees(jobTitleGet);
-                        employees.values().stream().map(e->e.toString()).forEach(e-> System.out.println(e));
-                    } catch (NullPointerException e) {
-                        System.out.println(e.getMessage());
-                    }
+                    System.out.println("JobTitle of Employee:\n");
+                    String jobTitleGet = scanner.nextLine();
+                    employeeService.getEmployeesByJobTitle(jobTitleGet).stream()
+                            .map(Employee::toString).forEach(System.out::println);
+
                     break;
                 case 5:
-                    try {
-                        System.out.println("Id of Employee: \n");
-                        String idP = scanner.nextLine();
-                        if(!company.getEmployees().containsKey(idP)){
-                            System.out.println("\nInvalid Id.\n");
-                            break;
-                        }
-                        company.pay(idP);
-                        System.out.println("\n Payment done.\n");
-                    } catch (NullPointerException e) {
-                        System.out.println(e.getMessage());
+
+                    System.out.println("Id of Employee: \n");
+                    String idP = scanner.nextLine();
+                    if (!employeeService.getAllEmployees().stream().anyMatch(e -> e.getId().equals(idP))) {
+                        System.out.println("\nInvalid Id.\n");
+                        break;
                     }
+                    salaryService.payEmployee(idP);
+                    System.out.println("\n Payment done.\n");
+
                     break;
                 case 6:
-                    try {
-                        System.out.println("Id of Employee: \n");
-                        String idI = scanner.nextLine();
-                        if(!company.getEmployees().containsKey(idI)){
-                            System.out.println("\nInvalid Id.\n");
-                            break;
-                        }
-                        System.out.println("New Salary of Employee:\n");
-                        double newSalary = 0;
-                        try {
-                            newSalary = scanner.nextDouble();
-                        } catch (InputMismatchException e) {
-                            System.out.println("Invalid salary entry.");
-                            break;
-                        }
-                        scanner.nextLine();
-                        company.increaseSalary(idI,newSalary);
-                    } catch (NullPointerException e) {
-                        System.out.println(e.getMessage());
+
+                    System.out.println("Id of Employee: \n");
+                    String idI = scanner.nextLine();
+                    if (!employeeService.getAllEmployees().stream().anyMatch(e -> e.getId().equals(idI))) {
+                        System.out.println("\nInvalid Id.\n");
+                        break;
                     }
+                    System.out.println("New Salary of Employee:\n");
+                    double newSalary;
+                    input = scanner.nextLine();
+                    if (!input.matches("\\d+")) {
+                        System.out.println("\nEntrada invalida.\n");
+                        break;
+                    }
+                    newSalary = Double.parseDouble(input);
+                    salaryService.increaseSalaryOfEmployee(idI, newSalary);
+
                     break;
                 case 7:
-                    try {
-                        System.out.println("JobTitle of Employee:\n");
-                        String jobTitleA = scanner.nextLine();
-                        System.out.println("\nAverage Salary: "+company.averageSalary(jobTitleA));
-                    } catch (NullPointerException e) {
-                        System.out.println(e.getMessage());
-                    }
+
+                    System.out.println("JobTitle of Employee:\n");
+                    String jobTitleA = scanner.nextLine();
+                    System.out.println("\nAverage Salary: " + salaryService.averageSalaryByJobTitle(jobTitleA));
+
                     break;
                 case 8:
-                    try {
-                        int YearI = 0;
-                        int MonthI = 0;
-                        int DayI = 0;
-                        int YearF = 0;
-                        int MonthF = 0;
-                        int DayF = 0;
-                        try {
-                            System.out.println("Initial Date:\n");
-                            System.out.println("Year: ");
-                            YearI = scanner.nextInt();
-                            System.out.println("Month: ");
-                            MonthI = scanner.nextInt();
-                            System.out.println("Day: ");
-                            DayI = scanner.nextInt();
-                            System.out.println("Final Date:\n");
-                            System.out.println("Year: ");
-                            YearF = scanner.nextInt();
-                            System.out.println("Month: ");
-                            MonthF = scanner.nextInt();
-                            System.out.println("Day: ");
-                            DayF = scanner.nextInt();
-                        } catch (InputMismatchException e) {
-                            System.out.println("Invalid Date entry.");
-                            break;
-                        }
-                        System.out.println("\nAverage Salary: "+company.averageSalary(LocalDate.of(YearI,MonthI,DayI),LocalDate.of(YearF,MonthF,DayF)));
-                    } catch (NullPointerException e) {
-                        System.out.println(e.getMessage());
+
+                    int YearI = 0;
+                    int MonthI = 0;
+                    int DayI = 0;
+                    int YearF = 0;
+                    int MonthF = 0;
+                    int DayF = 0;
+
+                    System.out.println("Initial Date:\n");
+                    System.out.println("Year: ");
+                    input = scanner.nextLine();
+                    if (!input.matches("\\d+")) {
+                        System.out.println("\nEntrada invalida.\n");
+                        break;
                     }
+                    YearI = Integer.parseInt(input);
+
+                    System.out.println("Month: ");
+                    input = scanner.nextLine();
+                    if (!input.matches("\\d+")) {
+                        System.out.println("\nEntrada invalida.\n");
+                        break;
+                    }
+                    MonthI = Integer.parseInt(input);
+
+                    System.out.println("Day: ");
+                    input = scanner.nextLine();
+                    if (!input.matches("\\d+")) {
+                        System.out.println("\nEntrada invalida.\n");
+                        break;
+                    }
+                    DayI = Integer.parseInt(input);
+
+                    System.out.println("Final Date:\n");
+                    System.out.println("Year: ");
+                    input = scanner.nextLine();
+                    if (!input.matches("\\d+")) {
+                        System.out.println("\nEntrada invalida.\n");
+                        break;
+                    }
+                    YearF = Integer.parseInt(input);
+
+                    System.out.println("Month: ");
+                    input = scanner.nextLine();
+                    if (!input.matches("\\d+")) {
+                        System.out.println("\nEntrada invalida.\n");
+                        break;
+                    }
+                    MonthF = Integer.parseInt(input);
+
+                    System.out.println("Day: ");
+                    input = scanner.nextLine();
+                    if (!input.matches("\\d+")) {
+                        System.out.println("\nEntrada invalida.\n");
+                        break;
+                    }
+                    DayF = Integer.parseInt(input);
+
+                    System.out.println("\nAverage Salary: " + salaryService.averageSalaryByDate(LocalDate.of(YearI, MonthI, DayI), LocalDate.of(YearF, MonthF, DayF)));
+
                     break;
                 default:
                     System.out.println("\nEntrada invalida.\n");

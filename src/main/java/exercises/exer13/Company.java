@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Company {
-    private List<Employee> employeeList;
+    private List<Employee> employeeList; //Refazer esse troço com map
 
     public Company() {
         this.employeeList = new ArrayList<>();
@@ -18,9 +18,7 @@ public class Company {
     }
 
     public void fire(String id){
-        Employee teste = new Employee(id,null,null,0,null);
-        employeeList.remove(teste);
-
+        employeeList.remove(new Employee(id,null,null,0,null));
     }
 
     public List<Employee> getEmployees() {
